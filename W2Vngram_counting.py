@@ -21,10 +21,11 @@ else:
 	#class_word_file='chunck_class_word.txt'
 	with open(class_word_file) as f:
 	  d = dict(x.rstrip().split(None, 1) for x in f)# save the file as dictioary with word as key
-	words_file='Iraqi_train.txt' #corpus file
-	words_file=sys.argv[2]+'.txt'
+	 
+	words_file=sys.argv[2]+'.txt' #corpus file
 	print(words_file)
-	#words_file='chunk.txt'
+	
+
 	with open(words_file) as f:
 		L= list(itertools.chain( line.split() for line in f)) #save the file as list of lines
 	L = list(filter(None, L))#delete empty lines
@@ -32,14 +33,11 @@ else:
 		a.insert(0, '<s>') #surround each line with<s> </s>
 		a.insert(len(a),'</s>')
 	Class_prob_word='CPW.txt' #output file 2 for SRILM ngram-count input
-	#Class_prob_word='toyCPW.txt' 	
 	target = open(Class_prob_word, 'w')
 	
 	
 	
 	L=list(itertools.chain(*L))# convert 2d list to 1d list
-	#print(' 1D List corpus')
-	#print(L)
 	cL=[]#corpus order classes list
 	unkclass=str(999)#<unk> unclassified words have class 999
 	#create list of classes of same word order
@@ -71,7 +69,6 @@ else:
 	target.close
 	
 	Class_count='CS.txt'#output file 2 for SRILM ngram input
-	#Class_count='toyCS.txt'
 	target = open(Class_count, 'w')
 	grouped = itertools.groupby(sorted(zip(cL, cL[1:])), lambda x: x[0])
 	
