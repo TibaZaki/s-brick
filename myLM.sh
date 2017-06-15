@@ -1,30 +1,30 @@
 
 echo   'START RUN'
 
-export IRSTLM=/home/tiba/kaldi/tools/irstlm
+export IRSTLM=/home/user/kaldi/tools/irstlm
 export PATH=${PATH}:${IRSTLM}/bin
-export LIBLBFGS=/home/tiba/kaldi/tools/liblbfgs-1.10
+export LIBLBFGS=/home/user/kaldi/tools/liblbfgs-1.10
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIBLBFGS}/lib/.libs
-export SRILM=/home/tiba/kaldi/tools/srilm
+export SRILM=/home/user/kaldi/tools/srilm
 export PATH=${PATH}:${SRILM}/bin:${SRILM}/bin/i686-m64
-path=/media/tiba/826EC6D56EC6C0E1/Data/2006Iraqi/arb_iraq_cttr/data/transc/data_division_6_4/
-train=Iraqi_train.txt
-#train=Iraqi_train.ATB.tok.txt
+
+train=corpus_train.txt
+#train=corpus_train.ATB.tok.txt
 echo 'train set is '$train
 test=devtest.txt
 #test=devtest.ATB.tok.txt
 echo 'test set is '$test
 #--------------------------word based LM -----------------------------------------
 
-#ngram-count -kndiscount -interpolate -order 2 -text  $train -lm bi_Iraqi.lm
+#ngram-count -kndiscount -interpolate -order 2 -text  $train -lm bi_corpus.lm
 
-#ngram-count -kndiscount -interpolate -order 3 -text $train -lm tri_Iraqi.lm
+#ngram-count -kndiscount -interpolate -order 3 -text $train -lm tri_corpus.lm
 #echo 'bigram '
-#ngram -lm bi_Iraqi.lm -ppl $test
+#ngram -lm bi_corpus.lm -ppl $test
 #echo 'trigram'
-#ngram -lm tri_Iraqi.lm -ppl $test
+#ngram -lm tri_corpus.lm -ppl $test
 #-------------------------------------------------------------------
-#./train_word2vec_Iraqi.sh
+#
 #--------------------------Class Based LM-----------------------------------------
 #classes formats should be class [p] word1 word2 ...
 #-classes file
@@ -50,7 +50,7 @@ K_Values=(10 150 300 450 500 700) # kmeans values
 V=200
 W=5
 for c in ${K_Values[@]}; do
-  ./train_word2vec_Iraqi.sh $c $V $W ${train%.txt} # train should be in same drive 
+  ./train_word2vec.sh $c $V $W ${train%.txt} # train should be in same drive 
 
    cat s.txt ${train%.txt}_classes_BOW_${c}v${V}w${W}.sorted.txt >${train%.txt}_classes_BOW_${c}v${V}w${W}.s.sorted.txt
    ./W2Vngram_counting.py ${c}v${V}w${W} ${train%.txt} 
@@ -64,12 +64,12 @@ for c in ${K_Values[@]}; do
 
    ngram-count   -order 2  \
             -read outputWV_BOW_${c}v${V}w${W}.s.ngrams \
-            -lm  Iraqi_WV_Class_BOW_${c}v${V}w${W}.s_Based.lm
+            -lm  corpus_WV_Class_BOW_${c}v${V}w${W}.s_Based.lm
 
-   ngram -lm Iraqi_WV_Class_BOW_${c}v${V}w${W}.s_Based.lm -classes output.WV-classes_BOW_${c}v${V}w${W}.s -ppl $test
+   ngram -lm corpus_WV_Class_BOW_${c}v${V}w${W}.s_Based.lm -classes output.WV-classes_BOW_${c}v${V}w${W}.s -ppl $test
 done
 
-exit 0
+exit 0 #for dubuging
 echo '-------------Brown----------------'
 #ngram-count -text $train -write-order 1 -write $train.1cnt
 #	awk '$2>1'  $train.1cnt | cut -f1 | sort > $train.vocab
@@ -80,7 +80,7 @@ K_Values=(900 950)
 for n in ${K_Values[@]}; do
 echo 'Morphological Brown, number of classes= ' $n 
 #ngram-class -vocab classes.sorted_vocab_vocab.txt \
-ngram-class -vocab Iraqi_train.ATB.tok_classes_BOW_10.s.sorted_vocab.txt \
+ngram-class -vocab corpus_train.ATB.tok_classes_BOW_10.s.sorted_vocab.txt \
             -text $train \
            -numclasses $n\
             -class-counts output.class-counts.$n \
@@ -92,9 +92,9 @@ ngram-count  -order 2 \
 
 ngram-count  -order 2  \
             -read output.ngrams.$n \
-            -lm  Iraqi_Brown_Class_Based.$n.lm
+            -lm  corpus_Brown_Class_Based.$n.lm
 
-ngram -lm Iraqi_Brown_Class_Based.$n.lm -classes output.classes.$n -ppl $test
+ngram -lm corpus_Brown_Class_Based.$n.lm -classes output.classes.$n -ppl $test
 
 done
 
