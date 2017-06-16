@@ -57,7 +57,7 @@ for c in ${K_Values[@]}; do
 
    sort CS.txt|uniq >output.WV-class_BOW_${c}v${V}w${W}.s-counts
    sort CPW.txt|uniq >output.WV-classes_BOW_${c}v${V}w${W}.s
-   #-kndiscount -interpolate
+
    ngram-count -order 2 \
            -read  output.WV-class_BOW_${c}v${V}w${W}.s-counts \
             -write outputWV_BOW_${c}v${V}w${W}.s.ngrams
@@ -75,26 +75,24 @@ echo '-------------Brown----------------'
 #	awk '$2>1'  $train.1cnt | cut -f1 | sort > $train.vocab
 #	awk '$2==1' $train.1cnt | cut -f1 | sort > $train.oov
 
-K_Values=(900 950)
-#(10 150 300 450 500 700)
+K_Values=(10 150 300 450 500 700 900 950)
 for n in ${K_Values[@]}; do
-echo 'Morphological Brown, number of classes= ' $n 
-#ngram-class -vocab classes.sorted_vocab_vocab.txt \
-ngram-class -vocab corpus_train.ATB.tok_classes_BOW_10.s.sorted_vocab.txt \
+   echo 'Brown, number of classes= ' $n 
+   ngram-class -vocab corpus_train_vocab.txt \
             -text $train \
            -numclasses $n\
             -class-counts output.class-counts.$n \
             -classes output.classes.$n
 
-ngram-count  -order 2 \
+   ngram-count  -order 2 \
             -read  output.class-counts.$n \
             -write output.ngrams.$n
 
-ngram-count  -order 2  \
+   ngram-count  -order 2  \
             -read output.ngrams.$n \
             -lm  corpus_Brown_Class_Based.$n.lm
 
-ngram -lm corpus_Brown_Class_Based.$n.lm -classes output.classes.$n -ppl $test
+   ngram -lm corpus_Brown_Class_Based.$n.lm -classes output.classes.$n -ppl $test
 
 done
 
